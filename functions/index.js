@@ -24,7 +24,6 @@
 
 // const express = require("express");
 // const app = express();
-// const { db } = require("./firebase.js");
 // const PORT = process.env.PORT || 8080;
 // const cors = require("cors");
 // const functions = require("firebase-functions");
@@ -59,12 +58,28 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-
+const { db } = require("./firebase.js");
 const app = express();
 app.use(cors());
 
 app.get("/test", (req, res) => {
   res.send("Hello World");
+});
+
+app.post("/inventory", async (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data.name);
+    await db
+      .collection("inventory")
+      .doc()
+      .set({ name: data.name, class: data.class });
+
+    res.status(201).json({ Message: "Success" });
+  } catch (e) {
+    console.error("Error:", e);
+    res.status(500).json({ Message: "Error" });
+  }
 });
 
 exports.app = functions.https.onRequest(app);
